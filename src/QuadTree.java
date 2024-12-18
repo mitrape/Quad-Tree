@@ -44,6 +44,21 @@ public class QuadTree{
 
         return imageArray;
     }
+    public int getDepth(Node node) {
+        if (node.children.isEmpty()) {
+            return 1;
+        }
+        int maxDepth = 0;
+        for (Node child : node.children) {
+            if (child != null) {
+                int childDepth = getDepth(child);
+                if (childDepth > maxDepth) {
+                    maxDepth = childDepth;
+                }
+            }
+        }
+        return 1 + maxDepth;
+    }
 
     public QuadTree (int[][] imageArray){
         // Build the quadtree
