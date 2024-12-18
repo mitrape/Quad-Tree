@@ -18,7 +18,7 @@ public class QuadTree{
             for (int y = 0; y < height; y++) {
                 int value = pixelArray[x][y];
                 int gray = (value << 16) | (value << 8) | value;
-                image.setRGB(x, y, gray);
+                image.setRGB(y, x, gray);
             }
         }
         return image;
@@ -108,7 +108,7 @@ public class QuadTree{
     public static void main(String[] args) {
         int[][] imageArray ;
         try {
-            imageArray = createPixelArray("/Users/melikadehestani/Desktop/uni/data structure/final project/project/dataSet/test.csv");
+            imageArray = createPixelArray("/Users/melikadehestani/Desktop/uni/data structure/final project/project/dataSet/image1_gray.csv");
             QuadTree quadTree = new QuadTree(imageArray);
             BufferedImage image = createImage(imageArray);
             saveImage(image, "output_image.png");
