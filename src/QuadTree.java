@@ -1,30 +1,23 @@
 import java.awt.image.BufferedImage;
 import java.awt.image.WritableRaster;
-import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
 
 import javax.imageio.ImageIO;
 
 public class QuadTree{
+    public static Node root;
 
-    public static int[][] imageTo1DArray(BufferedImage image) {
-        int width = image.getWidth();
-        int height = image.getHeight();
-        int[][] imageArray = new int[height][width];
-        WritableRaster raster = image.getRaster();
-
-        for (int i = 0; i < height; i++) {
-            for (int j = 0; j < width; j++) {
-                imageArray[i][j] = raster.getSample(j, i, 0); //Get grayscale pixel value.
-            }
-        }
-        return imageArray;
+    public QuadTree (int[][] imageArray){
+        // Build the quadtree
+        root = new Node(0, 0, imageArray.length);
+        root.buildQuadTree(imageArray);
     }
-
-    public QuadTree(int [][] image){
-
+    public int TreeDepth() {
+        if (root != null) {
+            return getDepth(root);
+        }
+        return 0;
     }
 
     public static void main(String[] args) {
@@ -37,21 +30,8 @@ public class QuadTree{
                 throw new IllegalArgumentException("Image must be a square with non-zero dimensions.");
             }
             int[][] imageArray = imageTo1DArray(image);
+            QuadTree quadTree = new QuadTree(imageArray);
 
-            // Build the quadtree
-            Node root = new Node(0, 0, imageArray.length);
-            root.buildQuadTree(imageArray);
-
-            // Create a FileWriter and BufferedWriter
-            FileWriter fileWriter = new FileWriter("quadtree_output.txt");
-            BufferedWriter bufferedWriter = new BufferedWriter(fileWriter);
-
-            // Print the Quadtree to the file
-            printQuadTree(root, 0, bufferedWriter);
-
-            // Close the BufferedWriter
-            bufferedWriter.close();
-            System.out.println("QuadTree written to quadtree_output.txt");
 
         } catch (IOException e) {
             System.err.println("Error loading image: " + e.getMessage());
@@ -60,23 +40,5 @@ public class QuadTree{
         }
     }
 
-
-
-    //Helper function to print the QuadTree structure (for demonstration purposes).
-    static void printQuadTree(Node node, int level, BufferedWriter writer) throws IOException {
-        for (int i = 0; i < level; i++) {
-            writer.write("  ");
-        }
-        if (node.children.isEmpty()) {
-            writer.write("Leaf: Color = " + node.color + "\n");
-        } else {
-            writer.write("Node: x=" + node.x + ", y=" + node.y + ", size=" + node.size + ", color=" + node.color + "\n");
-            for (Node child : node.children) {
-                if (child != null) {
-                    printQuadTree(child, level + 1, writer);
-                }
-            }
-        }
-    }
 
 }
