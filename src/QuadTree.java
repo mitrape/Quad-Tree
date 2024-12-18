@@ -72,14 +72,25 @@ public class QuadTree{
         return 0;
     }
 
+    public int pixelDepth(int px, int py) {
+        if (root == null) {
+            throw new IllegalStateException("QuadTree has not been built.");
+        }
+        return root.getNodeDepth(px, py, 1);
+    }
+
     public static void main(String[] args) {
         int[][] imageArray ;
         try {
-            imageArray = createPixelArray("dataSet\\image3_gray.csv");
+            imageArray = createPixelArray("/Users/melikadehestani/Desktop/uni/data structure/final project/project/dataSet/test.csv");
+            QuadTree quadTree = new QuadTree(imageArray);
+            int depth = quadTree.TreeDepth();
+            int level = quadTree.pixelDepth(0,1);
+            System.out.println(depth);
+            System.out.println(level);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-        QuadTree quadTree = new QuadTree(imageArray);
 
     }
 }

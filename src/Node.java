@@ -38,6 +38,25 @@ class Node {
         color = firstColor; // All pixels have the same color
         return true;
     }
+    int getNodeDepth(int px, int py, int level) {
+        if (size == 1 || children.isEmpty()) {
+            return level;
+        }
+        int halfSize = size / 2;
+        if (px < x + halfSize) {
+            if (py < y + halfSize) {
+                return children.get(0).getNodeDepth(px, py, level + 1); // NW
+            } else {
+                return children.get(2).getNodeDepth(px, py, level + 1); // SW
+            }
+        } else {
+            if (py < y + halfSize) {
+                return children.get(1).getNodeDepth(px, py, level + 1); // NE
+            } else {
+                return children.get(3).getNodeDepth(px, py, level + 1); // SE
+            }
+        }
+    }
 
     void buildQuadTree(int[][] image){
         if (isHomogeneous(image)) return; //Already homogeneous; don't split further.
