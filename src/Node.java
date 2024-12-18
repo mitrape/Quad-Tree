@@ -21,7 +21,6 @@ class Node {
         children.add(child);
     }
 
-    //Checks if it is possible to make this node a leaf, by averaging the color.
     boolean isHomogeneous(int[][] image) {
         if (size == 1) {
             color = image[y][x];
