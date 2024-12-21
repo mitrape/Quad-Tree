@@ -16,7 +16,11 @@ class Node {
         this.size = size;
     }
 
-
+    public boolean isLeaf (){
+        if(this.children.isEmpty())
+            return true;
+        else return false;
+    }
     void addChild(Node child) {
         children.add(child);
     }

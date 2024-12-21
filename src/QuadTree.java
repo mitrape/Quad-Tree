@@ -9,6 +9,44 @@ import javax.imageio.ImageIO;
 
 public class QuadTree{
     public static Node root;
+    public int[][] search;
+
+    public int[][] searchSubSpacesWithRange (int x1, int x2, int y1, int y2, int[][] imageArray){
+        search = new int[imageArray.length][imageArray.length];
+        Node p = root;
+        copySubspace(root,x1,y1,x2,y2,imageArray);
+        for (int i = 0; i < imageArray.length; i++) {
+            for (int j = 0; j < imageArray.length; j++) {
+                if(search[i][j] == 0){
+                    search[i][j] = 255;
+                }
+            }
+        }
+        return search;
+    }
+
+    private void copySubspace(Node originalNode, int x1, int y1, int x2, int y2, int[][] imageArray) {
+        if(isWithin(originalNode.x, originalNode.y, x1,y1,x2,y2)) {
+            if (intersects(originalNode.x, originalNode.y, originalNode.size, x1,y1,x2,y2) ) {
+
+            }
+        }
+        int halfSize = newNode.size / 2;
+        for (int i = 0; i < 4; i++) {
+            Node child = new Node(newNode.x + (i % 2) * halfSize, newNode.y + (i / 2) * halfSize, halfSize);
+            newNode.addChild(child);
+            copySubspace(child, originalNode.children.get(i), x1, y1, x2, y2, imageArray);
+        }
+    }
+
+    private boolean intersects(int nx, int ny, int nsize, int x1, int y1, int x2, int y2) {
+        return !(nx > x2 || ny > y2 || nx + nsize < x1 || ny + nsize < y1);
+    }
+
+    private boolean isWithin(int x, int y, int x1, int y1, int x2, int y2) {
+        return x >= x1 && x <= x2 && y >= y1 && y <= y2;
+    }
+
     public static BufferedImage createImage(int[][] pixelArray) {
         int width = pixelArray.length;
         int height = pixelArray[0].length;
