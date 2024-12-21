@@ -13,7 +13,6 @@ public class QuadTree{
 
     public int[][] searchSubSpacesWithRange (int x1, int x2, int y1, int y2, int[][] imageArray){
         search = new int[imageArray.length][imageArray.length];
-        Node p = root;
         copySubspace(root,x1,y1,x2,y2,imageArray);
         for (int i = 0; i < imageArray.length; i++) {
             for (int j = 0; j < imageArray.length; j++) {
@@ -24,26 +23,45 @@ public class QuadTree{
         }
         return search;
     }
+    public Node buildTreeSearchSubSpaces (int [][] image){
+        Node newNode = new Node(0,0,image.length);           //????
+        newNode.buildQuadTree(image);
+        return newNode;
+    }
 
     private void copySubspace(Node originalNode, int x1, int y1, int x2, int y2, int[][] imageArray) {
-        if(isWithin(originalNode.x, originalNode.y, x1,y1,x2,y2)) {
-            if (intersects(originalNode.x, originalNode.y, originalNode.size, x1,y1,x2,y2) ) {
-
+        if(intersects(originalNode.x, originalNode.y, x1,y1,x2,y2)) {
+            if (isWithin(originalNode.x, originalNode.y, originalNode.size, x1,y1,x2,y2) ) {
+                for (int i = originalNode.y; i < originalNode.size ; i++) {
+                    for (int j = originalNode.x; j < originalNode.size; j++) {
+                        search[j][i] = imageArray[j][i];
+                    }
+                }
             }
+            else if (originalNode.isLeaf()){
+                search [originalNode.x][originalNode.y] = imageArray[originalNode.x][originalNode.y];
+            }
+            else {
+                copySubspace(originalNode.children.get(0),x1,y1,x2,y2,imageArray);
+                copySubspace(originalNode.children.get(1),x1,y1,x2,y2,imageArray);
+                copySubspace(originalNode.children.get(2),x1,y1,x2,y2,imageArray);
+                copySubspace(originalNode.children.get(3),x1,y1,x2,y2,imageArray);
+            }
+
         }
-        int halfSize = newNode.size / 2;
-        for (int i = 0; i < 4; i++) {
-            Node child = new Node(newNode.x + (i % 2) * halfSize, newNode.y + (i / 2) * halfSize, halfSize);
-            newNode.addChild(child);
-            copySubspace(child, originalNode.children.get(i), x1, y1, x2, y2, imageArray);
+        else {
+            copySubspace(originalNode.children.get(0),x1,y1,x2,y2,imageArray);
+            copySubspace(originalNode.children.get(1),x1,y1,x2,y2,imageArray);
+            copySubspace(originalNode.children.get(2),x1,y1,x2,y2,imageArray);
+            copySubspace(originalNode.children.get(3),x1,y1,x2,y2,imageArray);
         }
     }
 
-    private boolean intersects(int nx, int ny, int nsize, int x1, int y1, int x2, int y2) {
+    private boolean isWithin(int nx, int ny, int nsize, int x1, int y1, int x2, int y2) {
         return !(nx > x2 || ny > y2 || nx + nsize < x1 || ny + nsize < y1);
     }
 
-    private boolean isWithin(int x, int y, int x1, int y1, int x2, int y2) {
+    private boolean intersects(int x, int y, int x1, int y1, int x2, int y2) {
         return x >= x1 && x <= x2 && y >= y1 && y <= y2;
     }
 
@@ -146,9 +164,9 @@ public class QuadTree{
     public static void main(String[] args) {
         int[][] imageArray ;
         try {
-            imageArray = createPixelArray("/Users/melikadehestani/Desktop/uni/data structure/final project/project/dataSet/image1_gray.csv");
+            imageArray = createPixelArray("D:\\programming projects\\QuadTree\\dataSet\\image1_gray.csv");
             QuadTree quadTree = new QuadTree(imageArray);
-            BufferedImage image = createImage(imageArray);
+            BufferedImage image = createImage(quadTree.searchSubSpacesWithRange(100,100,20,20,imageArray));
             saveImage(image, "output_image.png");
         } catch (IOException e) {
             throw new RuntimeException(e);
