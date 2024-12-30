@@ -10,7 +10,7 @@ class Node {
 
     Node(int x, int y, int size) {
         this.color = -1;
-        this.children = new LinkedList<>();
+        this.children= new LinkedList<>();
         this.x = x;
         this.y = y;
         this.size = size;
