@@ -186,29 +186,55 @@ public class QuadTree {
             }
         }
     }
-    public int[][] compress(int[][] imageArray, int newSize) {
-        int oldSize = imageArray.length;
-        int[][] resizedImage = new int[newSize][newSize];
+    public int[][] compress(int newSize, int[][] imageArray) {
+        int oldSize = root.size;
         int subspaceSize = oldSize / newSize;
+        int[][] compressedImage = new int[newSize][newSize];
         for (int i = 0; i < newSize; i++) {
             for (int j = 0; j < newSize; j++) {
-                int sum = 0;
-                int count = 0;
-                for (int x = i * subspaceSize; x < (i + 1) * subspaceSize; x++) {
-                    for (int y = j * subspaceSize; y < (j + 1) * subspaceSize; y++) {
-                        sum += imageArray[x][y];
-                        count++;
-                    }
-                }
-                int average = sum / count;
-                resizedImage[i][j] = average;
+                compressedImage[i][j] = getAverageColor(root, j * subspaceSize, i * subspaceSize, subspaceSize, imageArray);
             }
         }
-        return resizedImage;
+
+        return compressedImage;
     }
 
+    private int getAverageColor(Node node, int x, int y, int size, int[][] imageArray) {
+        if (node == null) return 0;
 
+        if (node.size == size) {
+            System.out.println("**1**");
+            return getNodeAverageColor(node, imageArray);
+        }
+        else if (node.isLeaf()) {
+            System.out.println("**2**");
+            return getNodeAverageColor(node, imageArray);
+        }
+        else {
+            System.out.println("**3**");
+            int sum = 0;
+            int count = 0;
+            for (Node child : node.children) {
+                if (child != null && intersects(child.x, child.y, child.size, x, y, x + size, y + size)) {
+                    System.out.println("child size is:"+child.size);
+                    sum += getAverageColor(child, x, y, size, imageArray);
+                    count++;
+                }
+            }
+            return count == 0 ? 0 : sum / count;
+        }
+    }
 
+    private int getNodeAverageColor(Node node, int [][] imageArray) {
+        int sum = 0;
+        for (int i = node.y; i < node.y + node.size; i++) {
+            for (int j = node.x; j < node.x + node.size; j++) {
+                sum += imageArray[i][j];
+            }
+        }
+        System.out.println(sum / (node.size * node.size));
+        return sum / (node.size * node.size);
+    }
 
 
     public static void main(String[] args) {
@@ -216,11 +242,7 @@ public class QuadTree {
         try {
             imageArray = createPixelArray("D:\\programming projects\\QuadTree\\dataSet\\test.csv");
             QuadTree quadTree = new QuadTree(imageArray);
-            int [][]imageNew = new int[2][2];
-            imageNew = quadTree.compress(imageArray,2);
-            BufferedImage image = createImage(quadTree.compress(imageArray,2));
-            System.out.println(imageNew[1][0]);
-            System.out.println(imageNew[0][0]);
+            BufferedImage image = createImage(quadTree.compress(2,imageArray));
             saveImage(image,"output.png");
         } catch (IOException e) {
             throw new RuntimeException(e);
