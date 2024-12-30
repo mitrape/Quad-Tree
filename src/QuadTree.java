@@ -35,21 +35,18 @@ public class QuadTree {
 
         if (intersects(originalNode.x, originalNode.y, originalNode.size, x1, y1, x2, y2)) {
             if (isWithin(originalNode.x, originalNode.y, originalNode.size, x1, y1, x2, y2)) {
-                System.out.println("**1**");
                 for (int i = originalNode.y; i < originalNode.y + originalNode.size; i++) {
                     for (int j = originalNode.x; j < originalNode.x + originalNode.size; j++) {
                         this.search[i][j] = imageArray[i][j];
                     }
                 }
             } else if (originalNode.isLeaf()) {
-                System.out.println("**2**");
                 for (int i = originalNode.y; i < originalNode.y + originalNode.size; i++) {
                     for (int j = originalNode.x; j < originalNode.x + originalNode.size; j++) {
                         this.search[i][j] = imageArray[i][j];
                     }
                 }
             } else {
-                System.out.println("**3**");
                 for (Node child : originalNode.children) {
                     copySubspace(child, x1, x2, y1, y2, imageArray);
                 }
@@ -60,13 +57,13 @@ public class QuadTree {
 
     private boolean isWithin(int nx, int ny, int nsize, int x1, int y1, int x2, int y2) {
         return nx >= x1 && nx <= x2 && ny >= y1 && ny <= y2 && nx+nsize >= x1 && nx+nsize <= x2 && ny+nsize >= y1 && ny+nsize <= y2 ;
-    }//checked
+    }
 
     private boolean intersects(int nx, int ny, int nsize, int x1, int y1, int x2, int y2) {
         int nodeEndX = nx + nsize;
         int nodeEndY = ny + nsize;
         return !(nodeEndX <= x1 || nx >= x2 || nodeEndY <= y1 || ny >= y2);
-    }//checked
+    }
 
     public static BufferedImage createImage(int[][] pixelArray) {
         int height = pixelArray.length;
@@ -154,6 +151,64 @@ public class QuadTree {
         return root.getNodeDepth(px, py, 1);
     }
 
+    public int[][] mask(int x1, int x2, int y1, int y2, int[][] imageArray) {
+        this.search = new int[imageArray.length][imageArray[0].length];
+        copySubspaceForMask(root, x1, x2, y1, y2, imageArray);
+        for (int i = 0; i < imageArray.length; i++) {
+            for (int j = 0; j < imageArray[0].length; j++) {
+                if (this.search[i][j] == 0) {
+                    this.search[i][j] = imageArray[i][j];
+                }
+            }
+        }
+        return this.search;
+    }
+
+    private void copySubspaceForMask(Node originalNode, int x1, int x2, int y1, int y2, int[][] imageArray) {
+        if (originalNode == null) return;
+        if (intersects(originalNode.x, originalNode.y, originalNode.size, x1, y1, x2, y2)) {
+            if (isWithin(originalNode.x, originalNode.y, originalNode.size, x1, y1, x2, y2)) {
+                for (int i = originalNode.y; i < originalNode.y + originalNode.size; i++) {
+                    for (int j = originalNode.x; j < originalNode.x + originalNode.size; j++) {
+                        this.search[i][j] = 255;
+                    }
+                }
+            } else if (originalNode.isLeaf()) {
+                for (int i = originalNode.y; i < originalNode.y + originalNode.size; i++) {
+                    for (int j = originalNode.x; j < originalNode.x + originalNode.size; j++) {
+                        this.search[i][j] = 255;
+                    }
+                }
+            } else {
+                for (Node child : originalNode.children) {
+                    copySubspaceForMask(child, x1, x2, y1, y2, imageArray);
+                }
+            }
+        }
+    }
+    public int[][] compress(int[][] imageArray, int newSize) {
+        int oldSize = imageArray.length;
+        int[][] resizedImage = new int[newSize][newSize];
+        int subspaceSize = oldSize / newSize;
+        for (int i = 0; i < newSize; i++) {
+            for (int j = 0; j < newSize; j++) {
+                int sum = 0;
+                int count = 0;
+                for (int x = i * subspaceSize; x < (i + 1) * subspaceSize; x++) {
+                    for (int y = j * subspaceSize; y < (j + 1) * subspaceSize; y++) {
+                        sum += imageArray[x][y];
+                        count++;
+                    }
+                }
+                int average = sum / count;
+                resizedImage[i][j] = average;
+            }
+        }
+        return resizedImage;
+    }
+
+
+
 
 
     public static void main(String[] args) {
@@ -161,15 +216,12 @@ public class QuadTree {
         try {
             imageArray = createPixelArray("D:\\programming projects\\QuadTree\\dataSet\\test.csv");
             QuadTree quadTree = new QuadTree(imageArray);
-//            int[][] searchArray = quadTree.searchSubSpacesWithRange(400, 900, 400, 1000, imageArray);
-            BufferedImage image = createImage(quadTree.searchSubSpacesWithRange(1,3,2,3,imageArray));
+            int [][]imageNew = new int[2][2];
+            imageNew = quadTree.compress(imageArray,2);
+            BufferedImage image = createImage(quadTree.compress(imageArray,2));
+            System.out.println(imageNew[1][0]);
+            System.out.println(imageNew[0][0]);
             saveImage(image,"output.png");
-//            for (int i = 0; i < imageArray.length; i++) {
-//                for (int j = 0; j < imageArray[0].length; j++) {
-//                    System.out.print(searchArray[i][j] + " ");
-//                }
-//                System.out.println();
-//            }
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
