@@ -25,23 +25,6 @@ public class QuadTree {
         return this.search;
     }
 
-    public Node buildTreeSearchSubSpaces(int[][] image) {
-        Node newNode = new Node(0, 0, image.length);
-        newNode.buildQuadTree(image);
-        return newNode;
-    }
-
-    public Node buildTreeMask(int[][] image) {
-        Node newNode = new Node(0, 0, image.length);
-        newNode.buildQuadTree(image);
-        return newNode;
-    }
-
-    public Node buildTreeCompress(int[][] image) {
-        Node newNode = new Node(0, 0, image.length);
-        newNode.buildQuadTree(image);
-        return newNode;
-    }
 
 
     private void copySubspace(Node originalNode, int x1, int x2, int y1, int y2, int[][] imageArray) {
@@ -264,8 +247,9 @@ public class QuadTree {
         try {
             imageArray = createPixelArray("D:\\programming projects\\QuadTree\\dataSet\\test.csv");
             QuadTree quadTree = new QuadTree(imageArray);
-            quadTree.printAndSaveQuadTree("quadtree.csv");
-            BufferedImage image = createImage(quadTree.compress(64,imageArray));
+            QuadTree search = new QuadTree(quadTree.searchSubSpacesWithRange(0,2,0,2,imageArray));
+            search.printAndSaveQuadTree("quadtree.csv");
+            BufferedImage image = createImage(quadTree.searchSubSpacesWithRange(0,2,0,2,imageArray));
             saveImage(image,"output.png");
         } catch (IOException e) {
             throw new RuntimeException(e);

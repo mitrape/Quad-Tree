@@ -1,3 +1,4 @@
+
 public class LinkedList<T> {
     private NodeList<T> head;
 

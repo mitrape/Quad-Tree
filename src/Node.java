@@ -59,7 +59,7 @@ class Node {
     }
 
     void buildQuadTree(int[][] image){
-        if (isHomogeneous(image)) return; //Already homogeneous; don't split further.
+        if (isHomogeneous(image)) return;
         int halfSize = size / 2;
         Node nw = new Node(x, y, halfSize);
         Node ne = new Node(x + halfSize, y, halfSize);
@@ -77,6 +77,3 @@ class Node {
 
 
 }
-
-
-
