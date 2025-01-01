@@ -1,10 +1,7 @@
-import java.util.LinkedList;
-import java.util.List;
-
 
 class Node {
     int color; // -1 indicates non-leaf node, otherwise stores the pixel value.
-    List<Node> children;
+    LinkedList<Node> children;
     int x, y, size;
 
 
