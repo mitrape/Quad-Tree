@@ -31,11 +31,11 @@ class Node {
         for (int i = y; i < y + size; i++) {
             for (int j = x; j < x + size; j++) {
                 if (image[i][j] != firstColor) {
-                    return false; // Found a different color
+                    return false;
                 }
             }
         }
-        color = firstColor; // All pixels have the same color
+        color = firstColor;
         return true;
     }
     int getNodeDepth(int px, int py, int level) {
