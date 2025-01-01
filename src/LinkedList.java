@@ -9,6 +9,16 @@ public class LinkedList<T> {
         return head == null;
     }
 
+    public int size() {
+        int count = 0;
+        NodeList<T> current = head;
+        while (current != null) {
+            count++;
+            current = current.next;
+        }
+        return count;
+    }
+
     public void add(T data) {
         NodeList<T> newNode = new NodeList<>(data);
         if (isEmpty()) {

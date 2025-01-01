@@ -4,6 +4,8 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import javax.imageio.ImageIO;
+import java.io.*;
+
 
 
 public class QuadTree {
@@ -242,13 +244,27 @@ public class QuadTree {
         }
         return sum / (node.size * node.size);
     }
+    public void printAndSaveQuadTree(Node node, PrintWriter writer, String prefix) {
+        if (node == null) return;
+        writer.println(prefix + "Node: x=" + node.x + ", y=" + node.y + ", size=" + node.size + ", color=" + node.color);
+        for (int i = 0; i < node.children.size(); i++) {
+            printAndSaveQuadTree(node.children.get(i), writer, prefix + "    ");
+        }
+    }
 
-
+    public void printAndSaveQuadTree(String filePath) {
+        try (PrintWriter writer = new PrintWriter(new FileWriter(filePath))) {
+            printAndSaveQuadTree(root, writer, "");
+        } catch (IOException e) {
+            System.err.println("Error saving the quadtree to a file: " + e.getMessage());
+        }
+    }
     public static void main(String[] args) {
         int[][] imageArray;
         try {
-            imageArray = createPixelArray("D:\\programming projects\\QuadTree\\dataSet\\image2_gray.csv");
+            imageArray = createPixelArray("D:\\programming projects\\QuadTree\\dataSet\\test.csv");
             QuadTree quadTree = new QuadTree(imageArray);
+            quadTree.printAndSaveQuadTree("quadtree.csv");
             BufferedImage image = createImage(quadTree.compress(64,imageArray));
             saveImage(image,"output.png");
         } catch (IOException e) {
