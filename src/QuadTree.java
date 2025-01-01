@@ -4,8 +4,7 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import javax.imageio.ImageIO;
-import java.util.LinkedList;
-import java.util.List;
+
 
 public class QuadTree {
     public static Node root;
@@ -30,6 +29,19 @@ public class QuadTree {
         return newNode;
     }
 
+    public Node buildTreeMask(int[][] image) {
+        Node newNode = new Node(0, 0, image.length);
+        newNode.buildQuadTree(image);
+        return newNode;
+    }
+
+    public Node buildTreeCompress(int[][] image) {
+        Node newNode = new Node(0, 0, image.length);
+        newNode.buildQuadTree(image);
+        return newNode;
+    }
+
+
     private void copySubspace(Node originalNode, int x1, int x2, int y1, int y2, int[][] imageArray) {
         if (originalNode == null) return;
 
@@ -47,8 +59,8 @@ public class QuadTree {
                     }
                 }
             } else {
-                for (Node child : originalNode.children) {
-                    copySubspace(child, x1, x2, y1, y2, imageArray);
+                for (int i = 0; i < 4; i++) {
+                    copySubspace(originalNode.children.get(i), x1, x2, y1, y2, imageArray);
                 }
             }
         }
@@ -121,7 +133,8 @@ public class QuadTree {
             return 1;
         }
         int maxDepth = 0;
-        for (Node child : node.children) {
+        for (int i = 0; i < 4; i++) {
+            Node child = node.children.get(i);
             if (child != null) {
                 int childDepth = getDepth(child);
                 if (childDepth > maxDepth) {
@@ -180,8 +193,8 @@ public class QuadTree {
                     }
                 }
             } else {
-                for (Node child : originalNode.children) {
-                    copySubspaceForMask(child, x1, x2, y1, y2, imageArray);
+                for (int i = 0; i < 4; i++) {
+                    copySubspaceForMask(originalNode.children.get(i), x1, x2, y1, y2, imageArray);
                 }
             }
         }
@@ -195,28 +208,23 @@ public class QuadTree {
                 compressedImage[i][j] = getAverageColor(root, j * subspaceSize, i * subspaceSize, subspaceSize, imageArray);
             }
         }
-
         return compressedImage;
     }
 
     private int getAverageColor(Node node, int x, int y, int size, int[][] imageArray) {
         if (node == null) return 0;
-
         if (node.size == size) {
-            System.out.println("**1**");
             return getNodeAverageColor(node, imageArray);
         }
         else if (node.isLeaf()) {
-            System.out.println("**2**");
-            return getNodeAverageColor(node, imageArray);
+            return node.color;
         }
         else {
-            System.out.println("**3**");
             int sum = 0;
             int count = 0;
-            for (Node child : node.children) {
+            for (int i = 0 ; i < 4 ; i++) {
+                Node child = node.children.get(i);
                 if (child != null && intersects(child.x, child.y, child.size, x, y, x + size, y + size)) {
-                    System.out.println("child size is:"+child.size);
                     sum += getAverageColor(child, x, y, size, imageArray);
                     count++;
                 }
@@ -232,7 +240,6 @@ public class QuadTree {
                 sum += imageArray[i][j];
             }
         }
-        System.out.println(sum / (node.size * node.size));
         return sum / (node.size * node.size);
     }
 
@@ -240,9 +247,9 @@ public class QuadTree {
     public static void main(String[] args) {
         int[][] imageArray;
         try {
-            imageArray = createPixelArray("D:\\programming projects\\QuadTree\\dataSet\\test.csv");
+            imageArray = createPixelArray("D:\\programming projects\\QuadTree\\dataSet\\image2_gray.csv");
             QuadTree quadTree = new QuadTree(imageArray);
-            BufferedImage image = createImage(quadTree.compress(2,imageArray));
+            BufferedImage image = createImage(quadTree.compress(64,imageArray));
             saveImage(image,"output.png");
         } catch (IOException e) {
             throw new RuntimeException(e);
